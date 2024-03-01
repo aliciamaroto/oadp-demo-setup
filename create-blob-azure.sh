@@ -35,7 +35,7 @@ az storage container create --account-name $STORAGE_ACCOUNT --name $CONTAINER  -
 #Azure
 echo -e "\nCreating an object storage secret "
 
-ACCOUNT_KEY=$(az storage account keys list --account-name $STORAGE_ACCOUNT --resource-group $RESOURCE_GROUP --query "[?keyName == 'key1'].value" -o tsv`)
+ACCOUNT_KEY=$(az storage account keys list --account-name $STORAGE_ACCOUNT --resource-group $RESOURCE_GROUP --query "[?keyName == 'key1'].value" -o tsv)
 
 echo -e "\nCreating a custom role with the minimun required permissions"
 
