@@ -64,8 +64,8 @@ AZURE_STORAGE_ACCOUNT_ACCESS_KEY=${ACCOUNT_KEY}
 AZURE_CLOUD_NAME=AzurePublicCloud
 EOF
 
-
-oc create secret generic cloud-credentials-azure -n openshift-adp --from-file cloud=credentials-velero
+sleep 10
+oc create secret generic cloud-credentials-azure -n openshift-adp --from-file cloud=operator-install/credentials-velero
 
 #Create BackupStorageLocation variables file:
 cat << EOF > ./operator-install/BackupStorageLocation-variables
@@ -75,5 +75,5 @@ export SUBSCRIPTION_ID=${AZURE_SUBSCRIPTION_ID}
 export BUCKET_NAME=${CONTAINER}
 EOF
 
-source ./BackupStorageLocation-variables
+source ./operator-install/BackupStorageLocation-variables
 envsubst < operator-install/dpa-tmp.yaml > operator-install/dpa.yaml
