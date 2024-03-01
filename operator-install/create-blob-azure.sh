@@ -7,8 +7,6 @@
 #AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
 #AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
 
-
-
 echo -e "\n========================"
 echo -e "Creating blob in Azure"
 echo -e "==========================\n"
@@ -56,7 +54,7 @@ az role definition create --role-definition '{
 
 echo -e "\nCreate a credentials-velero file"
 
-cat << EOF > ./credentials-velero
+cat << EOF > ./operator-install/credentials-velero
 AZURE_SUBSCRIPTION_ID=${AZURE_SUBSCRIPTION_ID}
 AZURE_TENANT_ID=${AZURE_TENANT_ID}
 AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
@@ -70,7 +68,7 @@ EOF
 oc create secret generic cloud-credentials-azure -n openshift-adp --from-file cloud=credentials-velero
 
 #Create BackupStorageLocation variables file:
-cat << EOF > ./BackupStorageLocation-variables
+cat << EOF > ./operator-install/BackupStorageLocation-variables
 export RESOURCE_GROUP=${RESOURCE_GROUP}
 export STORAGE_ACCOUNT=${STORAGE_ACCOUNT}
 export SUBSCRIPTION_ID=${AZURE_SUBSCRIPTION_ID}
@@ -78,4 +76,4 @@ export BUCKET_NAME=${CONTAINER}
 EOF
 
 source ./BackupStorageLocation-variables
-envsubst < dpa-tmp.yaml > dpa.yaml
+envsubst < operator-install/dpa-tmp.yaml > operator-install/dpa.yaml

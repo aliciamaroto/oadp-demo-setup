@@ -7,16 +7,16 @@ echo -e "=================================================\n"
 #Check if openshift-adp namespace exists, and if not create it.
 if ! (oc get project/openshift-adp) &> /dev/null; then
     echo -e "Creating openshift-adp namespace..."
-    oc apply -f namespace.yaml
+    oc apply -f operator-install/namespace.yaml
 else
     echo -e "Already in openshift-adp project"
 fi
 
 #Install Operator
 echo -e "\nCreating oadp operatorgroup..."
-oc apply -f operatorgroup.yaml
+oc apply -f operator-install/operatorgroup.yaml
 echo -e "\nCreating oadp subscription..."
-oc apply -f subscription.yaml
+oc apply -f operator-install/subscription.yaml
 
 #Wait for the operator to be installed:
 echo -e "\nWaiting for the operator to finish install"
@@ -25,11 +25,11 @@ oc wait csv oadp-operator.v1.3.0 -n openshift-adp --for=jsonpath='{.status.phase
 #sleep 90
 
 #Creating blob Azure:
-./create-blob-azure.sh
+./operator-install/create-blob-azure.sh
 
 #Create OpenShift Data Protection Application instance.
 echo -e "\nCreating OpenShift Data Protection Application instance..."
-oc apply -f dpa.yaml
+oc apply -f operator-install/dpa.yaml
 
 #Wait for the dpa instance to be reconciled:
 echo -e "\nWaiting for the DPA instance to be reconciled..."
