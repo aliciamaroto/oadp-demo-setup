@@ -18,16 +18,27 @@ oc apply -f operatorgroup.yaml
 echo -e "\nCreating oadp subscription..."
 oc apply -f subscription.yaml
 
-#sleep 60
+#Wait for the operator to be installed:
+echo -e "\nWaiting for the operator to finish install"
+sleep 10
+oc wait csv oadp-operator.v1.3.0 -n openshift-adp --for=jsonpath='{.status.phase}'="Succeeded"
+#sleep 90
 
 #Creating blob Azure:
 ./create-blob-azure.sh
-#sleep 60
 
 #Create OpenShift Data Protection Application instance.
-oc create secret generic cloud-credentials-azure -n openshift-adp --from-file cloud=credentials-velero
-echo -e "\nCreating OpenShift Data Protection Applciation instance..."
+echo -e "\nCreating OpenShift Data Protection Application instance..."
 oc apply -f dpa.yaml
+
+#Wait for the dpa instance to be reconciled:
+echo -e "\nWaiting for the DPA instance to be reconciled..."
+oc wait DataProtectionApplication  velero-sample -n openshift-adp --for=jsonpath='{.status.conditions[].type}'="Reconciled"
+
+#Wait for the BackupStorageLocation to be available:
+echo -e "\nWaiting for the BackupStorageLocation to be available..."
+sleep 60
+oc wait BackupStorageLocation velero-sample-1 -n openshift-adp --for=jsonpath='{.status.phase}'="Available"
 
 #Label VolumeSnapshotClass to use Data Mover 
 oc label volumesnapshotclass ocs-storagecluster-cephfsplugin-snapclass metadata.labels.velero.io/csi-volumesnapshot-class="true"

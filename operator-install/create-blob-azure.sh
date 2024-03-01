@@ -68,3 +68,14 @@ EOF
 
 
 oc create secret generic cloud-credentials-azure -n openshift-adp --from-file cloud=credentials-velero
+
+#Create BackupStorageLocation variables file:
+cat << EOF > ./BackupStorageLocation-variables
+export RESOURCE_GROUP=${RESOURCE_GROUP}
+export STORAGE_ACCOUNT=${STORAGE_ACCOUNT}
+export SUBSCRIPTION_ID=${AZURE_SUBSCRIPTION_ID}
+export BUCKET_NAME=${CONTAINER}
+EOF
+
+source ./BackupStorageLocation-variables
+envsubst < dpa-tmp.yaml > dpa.yaml
