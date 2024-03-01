@@ -15,11 +15,12 @@ fi
 #Install Operator
 echo -e "\nCreating oadp operatorgroup..."
 oc apply -f operator-install/operatorgroup.yaml
+
 echo -e "\nCreating oadp subscription..."
 oc apply -f operator-install/subscription.yaml
 
 #Wait for the operator to be installed:
-echo -e "\nWaiting for the operator to finish install"
+echo -e "\nWaiting for the operator to finish install..."
 sleep 10
 oc wait csv oadp-operator.v1.3.0 -n openshift-adp --for=jsonpath='{.status.phase}'="Succeeded"
 #sleep 90
@@ -41,4 +42,5 @@ sleep 60
 oc wait BackupStorageLocation velero-sample-1 -n openshift-adp --for=jsonpath='{.status.phase}'="Available"
 
 #Label VolumeSnapshotClass to use Data Mover 
+echo -e "\nLabel VolumeSnapshotClass to use Data Mover"
 oc label volumesnapshotclass ocs-storagecluster-cephfsplugin-snapclass metadata.labels.velero.io/csi-volumesnapshot-class="true"
