@@ -1,0 +1,4 @@
+export RESOURCE_GROUP=Velero_Backups
+export STORAGE_ACCOUNT=veleroe6059f0fc0cf
+export SUBSCRIPTION_ID=1ef10936-aa67-4214-97e8-416e07f5755b
+export BUCKET_NAME=velero

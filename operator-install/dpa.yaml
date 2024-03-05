@@ -1,0 +1,30 @@
+kind: DataProtectionApplication
+apiVersion: oadp.openshift.io/v1alpha1
+metadata:
+ name: velero-sample
+ namespace: openshift-adp
+spec:
+  backupLocations:
+    - velero:
+        config:
+          resourceGroup: Velero_Backups
+          storageAccount: veleroe6059f0fc0cf
+          storageAccountKeyEnvVar: AZURE_STORAGE_ACCOUNT_ACCESS_KEY
+          subscriptionId: 1ef10936-aa67-4214-97e8-416e07f5755b
+        credential:
+          key: cloud
+          name: cloud-credentials-azure
+        default: true
+        objectStorage:
+          bucket: velero
+          prefix: velero
+        provider: azure
+  configuration:
+    nodeAgent: 
+      enable: true 
+      uploaderType: kopia 
+    velero:
+      defaultPlugins:
+        - openshift
+        - azure
+        - csi

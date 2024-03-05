@@ -28,6 +28,12 @@ oc wait csv oadp-operator.v1.3.0 -n openshift-adp --for=jsonpath='{.status.phase
 #Creating blob Azure:
 ./operator-install/create-blob-azure.sh
 
+##########################333333#Set cephfs as default storage class
+##################################################
+#########################
+##################################################
+
+
 #Create OpenShift Data Protection Application instance.
 echo -e "\nCreating OpenShift Data Protection Application instance..."
 oc apply -f operator-install/dpa.yaml
@@ -44,3 +50,7 @@ oc wait BackupStorageLocation velero-sample-1 -n openshift-adp --for=jsonpath='{
 #Label VolumeSnapshotClass to use Data Mover 
 echo -e "\nLabel VolumeSnapshotClass to use Data Mover"
 oc label volumesnapshotclass ocs-storagecluster-cephfsplugin-snapclass metadata.labels.velero.io/csi-volumesnapshot-class="true"
+
+#With ODF Set as unique default Storage Class ocs-storagecluster-cephfs 
+oc patch storageclass ocs-storagecluster-cephfs -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
+oc patch storageclass thin-csi -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
