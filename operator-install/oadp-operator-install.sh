@@ -28,11 +28,6 @@ oc wait csv oadp-operator.v1.3.0 -n openshift-adp --for=jsonpath='{.status.phase
 #Creating blob Azure:
 ./operator-install/create-blob-azure.sh
 
-##########################333333#Set cephfs as default storage class
-##################################################
-#########################
-##################################################
-
 
 #Create OpenShift Data Protection Application instance.
 echo -e "\nCreating OpenShift Data Protection Application instance..."

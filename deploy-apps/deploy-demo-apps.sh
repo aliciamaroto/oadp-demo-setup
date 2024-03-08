@@ -11,6 +11,9 @@ echo -e "=================================================\n"
 
 oc new-project demo-app-01
 oc new-app centos/httpd-24-centos7~https://github.com/sclorg/httpd-ex --name='app-01'
+sleep 30
+
+oc expose svc app-01
 
 #DEMO 2: App with PVC attached using Snapshots
 echo -e "\n================================================"
