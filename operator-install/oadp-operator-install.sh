@@ -22,7 +22,7 @@ oc apply -f operator-install/subscription.yaml
 #Wait for the operator to be installed:
 echo -e "\nWaiting for the operator to finish install..."
 sleep 10
-oc wait csv oadp-operator.v1.3.0 -n openshift-adp --for=jsonpath='{.status.phase}'="Succeeded"
+oc wait csv oadp-operator.v1.3.1 -n openshift-adp --for=jsonpath='{.status.phase}'="Succeeded"
 #sleep 90
 
 #Creating blob Azure:
