@@ -22,7 +22,8 @@ oc apply -f operator-install/subscription.yaml
 #Wait for the operator to be installed:
 echo -e "\nWaiting for the operator to finish install..."
 sleep 10
-oc wait csv oadp-operator.v1.3.1 -n openshift-adp --for=jsonpath='{.status.phase}'="Succeeded"
+CSV=$(oc get csv -n openshift-adp -l  operators.coreos.com/redhat-oadp-operator.openshift-adp -o jsonpath='{.items[0].metadata.name}')
+oc wait csv $CSV -n openshift-adp --for=jsonpath='{.status.phase}'="Succeeded"
 #sleep 90
 
 #Creating blob Azure:
@@ -35,17 +36,18 @@ oc apply -f operator-install/dpa.yaml
 
 #Wait for the dpa instance to be reconciled:
 echo -e "\nWaiting for the DPA instance to be reconciled..."
-oc wait DataProtectionApplication  velero-sample -n openshift-adp --for=jsonpath='{.status.conditions[].type}'="Reconciled"
+oc wait DataProtectionApplication  velero-dpa -n openshift-adp --for=jsonpath='{.status.conditions[].type}'="Reconciled"
 
 #Wait for the BackupStorageLocation to be available:
 echo -e "\nWaiting for the BackupStorageLocation to be available..."
 sleep 60
-oc wait BackupStorageLocation velero-sample-1 -n openshift-adp --for=jsonpath='{.status.phase}'="Available"
+oc wait BackupStorageLocation velero-dpa-1 -n openshift-adp --for=jsonpath='{.status.phase}'="Available"
 
 #Label VolumeSnapshotClass to use Data Mover 
 echo -e "\nLabel VolumeSnapshotClass to use Data Mover"
-oc label volumesnapshotclass ocs-storagecluster-cephfsplugin-snapclass metadata.labels.velero.io/csi-volumesnapshot-class="true"
+VOLUMESNAPSHOTCLASS=$(oc get volumesnapshotclass -o jsonpath='{.items[0].metadata.name}')
+oc label volumesnapshotclass $VOLUMESNAPSHOTCLASS metadata.labels.velero.io/csi-volumesnapshot-class="true"
 
 #With ODF Set as unique default Storage Class ocs-storagecluster-cephfs 
-oc patch storageclass ocs-storagecluster-cephfs -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
-oc patch storageclass thin-csi -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'
+#oc patch storageclass ocs-storagecluster-cephfs -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "true"}}}'
+#oc patch storageclass thin-csi -p '{"metadata": {"annotations": {"storageclass.kubernetes.io/is-default-class": "false"}}}'

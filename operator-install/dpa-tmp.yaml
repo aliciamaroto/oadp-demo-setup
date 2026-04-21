@@ -1,7 +1,7 @@
 kind: DataProtectionApplication
 apiVersion: oadp.openshift.io/v1alpha1
 metadata:
- name: velero-sample
+ name: velero-dpa
  namespace: openshift-adp
 spec:
   backupLocations:
@@ -17,7 +17,7 @@ spec:
         default: true
         objectStorage:
           bucket: $BUCKET_NAME
-          prefix: velero
+          prefix: veleros
         provider: azure
   configuration:
     nodeAgent: 
