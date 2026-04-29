@@ -74,18 +74,28 @@ sleep 20
 POD5=$(oc get pods -l deployment=app-05 -n demo-app-05 -o jsonpath='{.items[0].metadata.name}')
 
 echo -e "Copying sakila-schema.sql to the mysql data directory in the pod"
-oc cp sakila-schema.sql demo-app-05/$POD5:/var/lib/mysql/data/sakila-schema.sql
+oc cp sakila-db/sakila-schema.sql demo-app-05/$POD5:/var/lib/mysql/data/sakila-schema.sql
 
 echo -e "Copying sakila-data.sql to the mysql data directory in the pod"
-oc cp sakila-data.sql demo-app-05/$POD5:/var/lib/mysql/data/sakila-data.sql
+oc cp sakila-db/sakila-data.sql demo-app-05/$POD5:/var/lib/mysql/data/sakila-data.sql
 
 echo -e "Loading database schema and data into MySQL"
-oc -n demo-app-05 exec $POD5 -- /bin/bash -c 'mysql -u user -p sakila < /var/lib/mysql/data/sakila-schema.sql'
-oc -n demo-app-05 exec $POD5 -- /bin/bash -c 'mysql -u user -p sakila < /var/lib/mysql/data/sakila-data.sql'
+oc -n demo-app-05 exec $POD5 -- /bin/bash -c 'mysql -u user -ppass < /var/lib/mysql/data/sakila-schema.sql'
+oc -n demo-app-05 exec $POD5 -- /bin/bash -c 'mysql -u user -ppass < /var/lib/mysql/data/sakila-data.sql'
 
 #Annotate deployment with pre-hook and post-hook
-oc patch deployment/app-05 -p '{"spec":{"template":{"metadata":{"annotations":{"pre.hook.backup.velero.io/command='["/bin/sh", "-c", "mysql -D sakila -u user --password=pass -e 'ALTER DATABASE sakila READ ONLY = 0;'"]'"}}}}}'
-oc patch deployment/app-05 -p '{"spec":{"template":{"metadata":{"annotations":{post.hook.backup.velero.io/container: mysql}}}}}'
-oc patch deployment/app-05 -p '{"spec":{"template":{"metadata":{"annotations":{"pre.hook.backup.velero.io/command='["/bin/sh", "-c", "mysql -D sakila -u user --password=pass -e 'ALTER DATABASE sakila READ ONLY = 1;'"]'"}}}}}'
-oc patch deployment/app-05 -p '{"spec":{"template":{"metadata":{"annotations":{post.hook.backup.velero.io/container: mysql}}}}}'
-oc patch deployment/app-05 -p '{"spec":{"template":{"metadata":{"annotations":{"pre.hook.backup.velero.io/timeout: 240s"}}}}}'
+oc patch deployment/app-05 -n demo-app-05 -p '{
+  "spec": {
+    "template": {
+      "metadata": {
+        "annotations": {
+          "pre.hook.backup.velero.io/command": "[\"/bin/sh\", \"-c\", \"mysql -u user --password=pass -e \\\"ALTER DATABASE sakila READ ONLY = 0;\\\"\"]",
+          "pre.hook.backup.velero.io/container": "mysql",
+          "pre.hook.backup.velero.io/timeout": "240s",
+          "post.hook.backup.velero.io/command": "[\"/bin/sh\", \"-c\", \"mysql -u user --password=pass -e \\\"ALTER DATABASE sakila READ ONLY = 0;\\\"\"]",
+          "post.hook.backup.velero.io/container": "mysql"
+        }
+      }
+    }
+  }
+}'
